@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+
+<style type="text/css">
+	#board{
+		background: url("bp.jpg");
+		border-size:cover;
+		-webkit-background-size: cover;
+        -moz-background-size: cover;
+        -o-background-size: cover;
+        background-size: 50%, 50%;
+		background-repeat: no-repeat;
+		background-position: center;
+		border:#999 1px solid ;
+		width: 80%;
+		height: 800px;
+		margin-right: auto;
+		margin-left: auto;
+
+	}
+	#left{
+		float: left;
+	}
+	#right{
+		float:right;
+	}
+	#{
+		
+	}
+	.second{
+		position: relative;
+		left:50px; top:50px;
+	}
+	.third{
+		position: relative;
+		 top:100px;
+	}
+	.fourth{
+		position: relative;
+		left:50px;top:150px;
+	}
+	#trash{
+		position: relative;
+		right:100px;
+		top: 50px;
+	}
+	#recycling{
+		position: relative;
+		right:100px;
+		top: 175px;
+	}
+	#other{
+		position: relative;
+		right:100px;
+		top: 300px;
+	}
+	#text{
+		font-size: 2em;
+		text-align: center;
+		color: blue;
+	}
+	#score{
+	font-family:"Trebuchet MS", Arial, Helvetica, sans-serif;
+	font-size:2em;
+	}
+
+
+	#t{
+	font-family:"Trebuchet MS", Arial, Helvetica, sans-serif;
+	width:100%;
+	border-collapse:collapse;
+	}
+	#t td {
+	font-size:1.2em;
+	border:1px solid #98bf21;
+	padding:3px 7px 2px 7px;
+	color:#000;
+	}
+	#t th {
+	font-size:1.4em;
+	border:1px solid #98bf21;
+	padding:3px 7px 2px 7px;
+	text-align:left;
+	padding-top:5px;
+	padding-bottom:4px;
+	background-color:#006633;
+	color:#fff;
+	}
+	#t tr.alt td {
+	color:#000;
+	background-color:#FFFFCC;
+	}
+</style>
+	
+
+
+
+</head>
+
+<body>
+	<div id="board">
+		<div id="left">
+			<img class = "first"  style="width:150px;height:150px;"; onclick="itemClicked(this)">
+		</br>
+			<img class = "second" style="width:150px;height:150px;" onclick="itemClicked(this)">
+		</br>
+			<img class = "third"  style="width:150px;height:150px;" onclick="itemClicked(this)">
+		</br>
+			<img class = "fourth"  style="width:150px;height:150px;" onclick="itemClicked(this)">
+		</div>
+
+		<div id="right">
+			<img id="trash" src="garbage.png" style="width:100px;height:100px;" onclick="disposalClicked(this)">
+		</br>
+			<img id="recycling" src="recycling.png" style="width:100px;height:100px;" onclick="disposalClicked(this)">
+		</br>
+			<img id="other" src="other.png" style="width:100px;height:100px;" onclick="disposalClicked(this)">
+		</div>
+
+	</div>
+	<div id="ta"></div>
+	<div id="ra"></div>
+	<div id="oa"></div>
+
+	
+
+
+	<div id="text">Nothing yet</div>
+
+
+
+<script>
+    var score=0;
+	var lastClickedItem="";
+	var otherArray=[];
+	var recycleArray=[];
+	var trashArray=[];
+	var ra;
+	var ta;
+	var oa;
+	var allItems=["aluminiumFoil","apple","box","bubbleWrap","candyWrapper","coffeeCup","detergentBottle","mascaraTube","microwavableFoodContainer","milkJug","ceramicMug","paperPlate", "paperTowelTube","pen","pencil","plasticCup","printerPaper","rug","sodaCan", "spiralNotebook","takeoutBox","teeShirt","usedTissues","waterBottle","wrappingPaper","cellPhone","laptop","battery","lightBulb","medicine","plasticBag","calculator"];
+	var A1=[];
+	var A2=[];
+	var A3=[];
+	var A4=[];
+	var A5=[];
+	var A6=[];
+	var A7=[];
+	var A8=[];
+	var loadLimit=4;
+	var recAns=["Water bottle","waterBottle","Plastic (solo) Cup", "plasticCup","Paper plate", "paperPlate", "Coffee cup", "coffeeCup", "Package box", "box", "Soda Can", "sodaCan", "Spiral Notebook", "spiralNotebook", "Mascara Tube", "mascaraTube", "Detergent Bottle", "detergentBottle", "Aluminium Foil", "aluminiumFoil", "Printer Paper", "printerPaper", "Takeout box", "takeoutBox", "Paper towel tube", "paperTowelTube", "Wrapping paper", "wrappingPaper", "Milk jug", "milkJug", "Bubble Wrap", "bubbleWrap"];
+	var recExt=["Plastic #","Plastic #","Remove all food from plate before disposal.","Rinse before disposal.","Corrugated cardboard","","The spiral binding does not need to be removed.","Beauty Products should be thrown away. Shampoo and conditioner bottles may be recycled though.","Plastic #","Make sure to rinse off all food.","","Make sure the box is not very greasy or else it cannot be recycled. Also, all food should be removed from the box.","Compressed cardboard","Glittery and embellished wrapping paper and tissue paper cannot be recycled.","Plastic #","Plastic #4"];
+	var garAns=["Used Tissue","usedTissues","Apple Core","apple","Ceramic Mug","ceramicMug","Carpet","rug","Pen","pen","Pencil","pencil","Microwavable Food Container","microwavableFoodContainer","Tee-shirt","teeShirt", "Candy Wrapper", "candyWrapper"];
+	var garExt=["","Can be composted.","","Can be donated and reused.","","","","Can be donated and reused.",""];
+	var othAns=["Cellphone","cellPhone", "Laptop","laptop", "Battery","battery",  "Fluorescent light bulb","lightBulb" , "Medicine","medicine",  "Plastic Bag", "plasticBag", "Calculator","calculator"];
+	var othExt=["Electronics cannot legally be thrown out in New York State. They are toxic waste. Can be brought to the Union electronics collection bin or other collection facilities. Can be donated to be reused.","Electronics cannot legally be thrown out in New York State. They are toxic waste. Can be brought to the Union electronics collection bin or other collection facilities. Can be donated to be reused.","Should not be thrown out. They are toxic waste. Bring to special collection facility.","Should not be thrown out. They are toxic waste. Bring to special collection facility. Incandescent bulbs can be thrown away.","Should not be thrown out. Can contaminate water supplies. Bring to special collection facility.","Cannot be recycled in regular recycling reciprocals. Most grocery stores have plastic bag recycling collection bins – including Wegmans. Can be reused.","They are toxic waste. Can be brought to the Union collection bin or other collection facilities."]
+
+	initialize(allItems);
+	load(A1);    //initialize pictures
+
+	function load(arr){
+	var num_word;
+	
+		for(var i=0;i<arr.length;i++){
+			switch(i){
+				case 0:
+					num_word="first";
+					break;
+				case 1:
+					num_word="second";
+					break;
+				case 2:
+					num_word="third";
+					break;
+				case 3:
+					num_word="fourth";
+					break;
+			
+			
+			}
+			var temp = document.getElementsByClassName(num_word);
+			var temp2 = temp[0];
+			temp2.src=arr[i]+".png";
+			temp2.id=arr[i];
+			temp2.style.visibility="visible";
+			temp2.style.border="";
+			
+			
+		}
+		lastClickedItem="";
+	
+	}
+
+
+	
+	
+	function itemClicked(caller){
+		if(lastClickedItem!=""){
+			document.getElementById(lastClickedItem).style.border="";
+		}
+		var obj= document.getElementById(caller.id)
+		lastClickedItem=obj.id;
+		if(obj.style.border==""){
+			obj.style.border="#999 1px solid";
+		}
+		else{
+			obj.style.border="";
+		}
+		var tempStr=lastClickedItem;
+		if(recAns.indexOf(lastClickedItem)!=-1){tempStr=recAns[recAns.indexOf(lastClickedItem)-1];}
+		if(garAns.indexOf(lastClickedItem)!=-1){tempStr=garAns[garAns.indexOf(lastClickedItem)-1];}
+		if(othAns.indexOf(lastClickedItem)!=-1){tempStr=othAns[othAns.indexOf(lastClickedItem)-1];}
+		document.getElementById("text").innerHTML=tempStr;
+	}
+
+	function disposalClicked(caller){
+		var method=caller.id;
+		if(lastClickedItem!="" && recycleArray.indexOf(lastClickedItem)==-1 && trashArray.indexOf(lastClickedItem)==-1){
+			if(method=="recycling"){
+				recycleArray.push(lastClickedItem);
+			}
+			if(method=="trash"){
+				trashArray.push(lastClickedItem);
+			}
+			if(method=="other"){
+				otherArray.push(lastClickedItem);
+			}
+			document.getElementById(lastClickedItem).style.visibility='hidden';
+			
+		}
+		ra="";
+		for(var i=0;i<recycleArray.length;i++){
+			ra=ra+" "+recycleArray[i];
+		}
+		ta="";
+		for(var i=0;i<trashArray.length;i++){
+			ta=ta+" "+trashArray[i];
+		}
+		oa="";
+		for(var i=0;i<otherArray.length;i++){
+			oa=oa+" "+otherArray[i];
+		}
+		//document.getElementById("RA").innerHTML=ra;
+		//document.getElementById("TA").innerHTML=ta;
+		//document.getElementById("ra").innerHTML="recycle: "+ra;
+		//document.getElementById("ta").innerHTML="trash: "+ta;
+		//document.getElementById("oa").innerHTML="other: "+oa;
+		var itemsDone=recycleArray.length+trashArray.length+otherArray.length;    // set load limit on last one to know its finished then display case swithc 
+		
+
+		if(itemsDone>=loadLimit){
+			//if (loadLimit==24){ //last 2 items
+			//	loadLimit+=1;
+			//	load(A7);
+			//}
+			
+			if (loadLimit==32){ //done
+				display();
+			}
+			else{
+				switch(loadLimit){
+					case 4: 
+						load(A2);
+						break;
+					case 8: 
+						load(A3);
+						break;
+					case 12: 
+						load(A4);
+						break;
+					case 16: 
+						load(A5);
+						break;
+					case 20: 
+						load(A6);
+						break;
+					case 24: 
+						load(A7);
+						break;
+					case 28: 
+						load(A8);
+						break;
+					
+
+				}
+				loadLimit+=4;
+				
+			}
+
+			
+		}
+
+	}
+	
+	
+	function calculateScore(){
+		for (var i=1;i<recAns.length;i=i+2){
+			if(recycleArray.indexOf(recAns[i])!=-1){score++;}
+			else{
+				document.getElementById(recAns[i]).style.color="red";
+			}
+		
+		}
+		for (var i=1;i<garAns.length;i=i+2){
+			if(trashArray.indexOf(garAns[i])!=-1){score++;}
+			else{
+				document.getElementById(garAns[i]).style.color="red";
+			}
+		
+		}
+		console.log("lenght: "+ othAns.length);
+		for (var i=1;i<othAns.length;i=i+2){
+			if(otherArray.indexOf(othAns[i])!=-1){score++;}
+			else{
+				document.getElementById(othAns[i]).style.color="red";
+				console.log("trying to set red: "+ othAns[i]);
+			}
+		
+		}
+	}
+		
+	
+
+	function display(){
+		// //document.getElementById("right").innerHTML="recycled: "+ra + "</br>"+ "trash: "+ta;
+		document.getElementById("text").innerHTML="";
+		var count=0;
+		document.getElementById("board").innerHTML="";
+		document.getElementById("board").id="results";
+		document.getElementById("results").innerHTML="";
+		var cat="<div id='score'></div>";
+		cat=cat+"<table id='t'>"
+		cat=cat+"<tr> <th> Recyclable</th> <th> Extra Information </th> </tr>"; 
+		for (var i=0;i<recAns.length;i=i+2){
+
+			if (count==0){
+				cat=cat+"<tr>";
+				count=1;
+			}
+			else{
+				cat=cat+"<tr class='alt'>";
+				count=0;
+			}
+
+
+			cat=cat+"<td id='"+recAns[i+1]+"'>"+recAns[i]+"</td>"+   "<td>" +recExt[i/2]+ "</td>" +"</tr>";
+		}
+		
+		//---------------------now trash -------------------------
+
+		cat=cat+"<tr> <th> Garbage</th> <th> Extra Information </th> </tr>"; 
+		for (var i=0;i<garAns.length;i=i+2){
+
+			if (count==0){
+				cat=cat+"<tr>";
+				count=1;
+			}
+			else{
+				cat=cat+"<tr class='alt'>";
+				count=0;
+			}
+
+
+			cat=cat+"<td id='"+garAns[i+1]+"'>"+garAns[i]+"</td>"+   "<td>" +garExt[i/2]+ "</td>" +"</tr>";
+		}
+		
+		//-------------------now other----------------------------
+		cat=cat+"<tr> <th> Other</th> <th> Extra Information </th> </tr>"; 
+		for (var i=0;i<othAns.length;i=i+2){
+
+			if (count==0){
+				cat=cat+"<tr>";
+				count=1;
+			}
+			else{
+				cat=cat+"<tr class='alt'>";
+				count=0;
+			}
+
+			cat=cat+"<td id='"+othAns[i+1]+"'>"+othAns[i]+"</td>"+   "<td>" +othExt[i/2]+ "</td>" +"</tr>";
+		}
+
+
+
+		cat=cat+"</table>";
+		document.getElementById("results").innerHTML=cat;
+		calculateScore();
+		document.getElementById("score").innerHTML="SCORE: "+score+ "/32";
+		//THEN CALL SCORE CHECKER WHICH WILL TALLY SCORE AND SET TO RED
+	}
+
+	function initialize(toBeCopied){
+		//deep copy
+		var items=[50];
+		for(var i=0;i<toBeCopied.length;i++){
+			console.log(toBeCopied.length);
+			items[i]=toBeCopied[i];
+		}
+
+		var assignCount=0;
+
+		while (items.length!=0){
+			var index=parseInt(Math.random()*items.length);
+
+
+			if (assignCount<4){
+				A1.push(items[index]);
+
+			}
+			else if (assignCount<8){
+				A2.push(items[index]);
+			}
+			else if (assignCount<12){
+				A3.push(items[index]);	
+			}
+			else if (assignCount<16){
+				A4.push(items[index]);
+			}
+			else if (assignCount<20){
+				A5.push(items[index]);	
+			}
+			else if (assignCount<24){
+				A6.push(items[index]);	
+			}
+			else if (assignCount<28){
+				A7.push(items[index]);	
+			}
+			else if (assignCount<32){
+				A8.push(items[index]);	
+			}
+			items.splice(index,1);
+			assignCount++;
+		}
+
+		
+	
+		for(var i=0;i<A1.length;i++){
+			"item:"
+			A1[i];
+		}
+
+	}
+
+	
+
+	
+
+
+
+</script>
+
+</body>
+</html>
+
+ 
